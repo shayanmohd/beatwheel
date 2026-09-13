@@ -6,11 +6,11 @@
 
 ## App name
 <!-- at most 30 characters. verify.sh counts everything in this section except comments. -->
-Strobe Tuner: Chromatic, Drone
+Beatwheel: Strobe Tuner, Drone
 
 ## Short description
 <!-- at most 80 characters, one line, no trailing period. -->
-Sub-cent strobe tuner with temperaments, drone and drift chart. No ads, offline
+Chromatic strobe tuner with a drone, temperaments, drift chart. No ads, offline
 
 ## Full description
 <!-- at most 4000 characters. Plain paragraphs and CAPITALISED headings; Play renders no markdown.
