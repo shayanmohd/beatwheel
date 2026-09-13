@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beatwheel strobe tuner</title>
+<meta name="description" content="A paid strobe tuner for wind and string players: a drone that sounds while it measures, drift sessions exported as CSV, A 415 to 466 and six temperaments. No ads, works offline.">
+<style>
+  @font-face { font-family: "Barlow Semi Condensed"; src: url("fonts/barlow_semi_condensed_medium.ttf") format("truetype"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: "Barlow Semi Condensed"; src: url("fonts/barlow_semi_condensed_semibold.ttf") format("truetype"); font-weight: 600; font-display: swap; }
+  @font-face { font-family: "Atkinson Hyperlegible Next"; src: url("fonts/atkinson_hyperlegible_next.ttf") format("truetype"); font-weight: 200 800; font-display: swap; }
+
+  :root {
+    --stand: #EFF2F4; --case: #DFE4E8; --ink: #18212A; --graphite: #4F5B66; --rule: #B9C2CA; --neon: #C85A26;
+    --display: "Barlow Semi Condensed", "Arial Narrow", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --r-sm: 4px; --r-md: 10px; --r-lg: 20px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --stand: #12171C; --case: #1C232A; --ink: #E3E8EC; --graphite: #9AA6B1; --rule: #34404A; --neon: #E8844A; }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--stand); color: var(--ink); font: 400 17px/1.6 var(--body); }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--neon); outline-offset: 3px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; }
+  h1 { font-size: clamp(2.5rem, 4.4vw, 3.4rem); line-height: 1.05; letter-spacing: -0.01em; }
+  h2 { font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.06; }
+  h3 { font-size: 1.4rem; line-height: 1.15; font-weight: 500; }
+  p { margin: 0; max-width: 60ch; }
+  .muted { color: var(--graphite); }
+  .num { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .shot { border-radius: var(--r-lg); border: 1px solid var(--rule); background: var(--case); }
+
+  /* Brand bar */
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 600; font-size: 1.5rem; text-decoration: none; }
+  .brand svg { width: 30px; height: 30px; }
+
+  /* Hero: copy left, the real Tune screen right */
+  .hero { display: grid; grid-template-columns: 3fr 2fr; gap: 48px; align-items: center; padding-block: 32px 96px; }
+  .hero p { margin-top: 22px; font-size: 1.22rem; color: var(--graphite); max-width: 36ch; }
+  .cta { display: inline-block; margin-top: 34px; background: var(--ink); color: var(--stand); text-decoration: none; font-weight: 600;
+         padding: 16px 28px; border-radius: var(--r-md); font-size: 1.05rem; white-space: nowrap; transition: transform 120ms ease; }
+  .cta:active { transform: translateY(1px); }
+  .price-line { margin-top: 16px; font-size: 0.98rem; color: var(--graphite); }
+  .hero .shot { max-width: 380px; width: 100%; justify-self: end; }
+
+  /* The disc that stops */
+  .still { border-top: 1px solid var(--rule); padding-block: 96px; text-align: center; }
+  .still h2 { max-width: 18ch; margin: 0 auto; }
+  .disc { width: min(440px, 80vw); aspect-ratio: 1; margin: 56px auto 48px; }
+  .disc svg { width: 100%; height: 100%; display: block; }
+  .disc .wheel { transform-origin: 200px 200px; }
+  .disc .ring { fill: none; stroke: var(--neon); }
+  .disc .rim { fill: none; stroke: var(--rule); stroke-width: 2; }
+  .disc .letter { font-family: var(--display); font-weight: 600; font-size: 104px; fill: var(--ink); }
+  .disc .oct { font-family: var(--display); font-weight: 500; font-size: 38px; fill: var(--graphite); }
+  .rules { display: grid; grid-template-columns: repeat(3, auto); justify-content: center; gap: 12px 56px; }
+  .rules p { font-family: var(--display); font-weight: 500; font-size: 1.55rem; line-height: 1.2; }
+  .rules p span { color: var(--graphite); }
+  @media (prefers-reduced-motion: no-preference) {
+    .disc.play .wheel { animation: settle 3.6s cubic-bezier(.1,.6,.2,1) both; }
+    @keyframes settle { from { transform: rotate(-200deg); } to { transform: rotate(0deg); } }
+  }
+
+  /* Drone: screenshot left, copy right */
+  .drone { display: grid; grid-template-columns: 5fr 7fr; gap: 72px; align-items: center; padding-block: 96px; border-top: 1px solid var(--rule); }
+  .drone .shot { max-width: 360px; width: 100%; }
+  .drone h2 { margin-bottom: 20px; max-width: 16ch; }
+  .drone p + p { margin-top: 14px; }
+
+  /* Drift: three columns, numbers, screen, file */
+  .drift { padding-block: 96px; border-top: 1px solid var(--rule); }
+  .drift h2 { max-width: 20ch; }
+  .drift > p { margin-top: 18px; }
+  .drift-grid { display: grid; grid-template-columns: 1fr minmax(0, 340px) 1.2fr; gap: 56px; align-items: center; margin-top: 56px; }
+  .drift-grid > * { min-width: 0; }
+  .stats { margin: 0; display: grid; gap: 28px; }
+  .stats dt { font-size: 0.95rem; color: var(--graphite); }
+  .stats dd { margin: 0; font-family: var(--body); font-size: 2.4rem; line-height: 1.1; }
+  .stats dd.accent { color: var(--neon); }
+  .file { background: var(--case); border-radius: var(--r-md); padding: 22px 24px; overflow-x: auto; }
+  .file h3 { font-size: 1.15rem; margin-bottom: 12px; }
+  .file pre { margin: 0; font: 500 0.8rem/1.7 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--ink); white-space: pre; }
+  .file p { margin-top: 14px; font-size: 0.95rem; }
+
+  /* Gallery: one tall lead, two beside */
+  .gallery { padding-block: 96px; border-top: 1px solid var(--rule); }
+  .gallery h2 { max-width: 22ch; margin-bottom: 48px; }
+  .gal { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 32px; align-items: start; }
+  .gal figure:nth-child(2) { margin-top: 72px; }
+  .gal figure:nth-child(3) { margin-top: 144px; }
+  figure { margin: 0; }
+  figcaption { margin-top: 14px; font-size: 0.98rem; color: var(--graphite); max-width: 34ch; }
+
+  /* Details: two columns */
+  .details { display: grid; grid-template-columns: 1fr 1fr; gap: 0 72px; padding-block: 16px 96px; }
+  .details div { padding-block: 28px; border-top: 1px solid var(--rule); }
+  .details h3 { margin-bottom: 8px; }
+
+  /* Price band */
+  .band { background: var(--case); }
+  .band .wrap { display: grid; grid-template-columns: auto 1fr; gap: 24px 80px; align-items: center; padding-top: 80px; padding-bottom: 80px; }
+  .price { font-family: var(--display); font-weight: 600; font-size: clamp(3.2rem, 7vw, 5.4rem); line-height: 1; }
+  .price small { display: block; font-family: var(--body); font-weight: 400; font-size: 1rem; color: var(--graphite); margin-top: 12px; }
+  .band p { font-size: 1.3rem; }
+  .band p + p { margin-top: 12px; font-size: 1rem; color: var(--graphite); }
+
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 32px; padding-bottom: 48px; color: var(--graphite); font-size: 0.95rem; }
+
+  @media (max-width: 900px) {
+    .hero, .drone, .details, .band .wrap { grid-template-columns: 1fr; }
+    .hero { gap: 40px; padding-block: 16px 72px; }
+    .hero .shot { justify-self: start; max-width: 340px; }
+    .drone { gap: 40px; padding-block: 72px; }
+    .drift-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .drift-grid .file { grid-column: 1 / -1; }
+    .rules { grid-template-columns: 1fr; }
+    .gal { grid-template-columns: 1fr 1fr; }
+    .gal figure:nth-child(2) { margin-top: 48px; }
+    .gal figure:nth-child(3) { margin-top: 0; grid-column: 1 / -1; max-width: 360px; }
+    .still, .drift, .gallery { padding-block: 72px; }
+  }
+  @media (max-width: 560px) {
+    .drift-grid, .gal { grid-template-columns: minmax(0, 1fr); }
+    .gal figure:nth-child(2) { margin-top: 0; }
+    .gal figure, .drift-grid .shot { max-width: 340px; }
+    .rules p { font-size: 1.35rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="wrap bar">
+  <a class="brand" href="#top" aria-label="Beatwheel">
+    <svg viewBox="0 0 40 40" aria-hidden="true">
+      <circle cx="20" cy="20" r="16" fill="none" stroke="var(--neon)" stroke-width="7" stroke-dasharray="6.283 6.283" transform="rotate(-90 20 20)"/>
+      <circle cx="20" cy="20" r="5" fill="var(--ink)"/>
+    </svg>
+    Beatwheel
+  </a>
+</header>
+
+<main id="top">
+  <section class="wrap hero">
+    <div>
+      <h1>The strobe tuner that holds a drone while it listens.</h1>
+      <p>The disc stands still when you are in tune, and a drone keeps sounding while Beatwheel measures.</p>
+      <a class="cta" href="https://play.google.com/store/apps/details?id=com.mohdshayan.beatwheel">Get it on Google Play</a>
+      <p class="price-line">USD 3.99 once. No ads, works offline.</p>
+    </div>
+    <img class="shot" src="shots/01-baroque-oboe-a415-disc-still.png" width="1080" height="1920"
+         alt="Tune screen for a Baroque oboe profile at A 415.0 in Werckmeister III, the strobe disc still on A4 at 0.0 cents">
+  </section>
+
+  <section class="wrap still">
+    <h2>Stillness is the signal.</h2>
+    <div class="disc" id="disc">
+      <svg viewBox="0 0 400 400" role="img" aria-label="A strobe disc of four tangerine rings standing still around the note A4">
+        <g class="wheel">
+          <circle class="ring" cx="200" cy="200" r="172" stroke-width="20" stroke-dasharray="8.443 8.443" transform="rotate(-90 200 200)"/>
+          <circle class="ring" cx="200" cy="200" r="145" stroke-width="20" stroke-dasharray="14.235 14.235" transform="rotate(-90 200 200)"/>
+          <circle class="ring" cx="200" cy="200" r="118" stroke-width="20" stroke-dasharray="23.169 23.169" transform="rotate(-90 200 200)"/>
+          <circle class="ring" cx="200" cy="200" r="91" stroke-width="20" stroke-dasharray="35.736 35.736" transform="rotate(-90 200 200)"/>
+        </g>
+        <circle class="rim" cx="200" cy="200" r="194"/>
+        <text class="letter" x="190" y="236" text-anchor="middle">A</text>
+        <text class="oct" x="238" y="238" text-anchor="middle">4</text>
+      </svg>
+    </div>
+    <div class="rules">
+      <p>Sharp <span>turns it clockwise.</span></p>
+      <p>Flat <span>turns it back.</span></p>
+      <p>In tune <span>it stops.</span></p>
+    </div>
+  </section>
+
+  <section class="wrap drone">
+    <img class="shot" src="shots/02-reed-drone-beats-per-second.png" width="1080" height="1920" loading="lazy"
+         alt="Tune screen with a reed drone on A3 playing and the readout showing 0.6 beats per second, sharp, at 415.6 Hz">
+    <div>
+      <h2>A drone that keeps sounding while you tune</h2>
+      <p>Start a sine, reed or saw drone on any note from octave 2 to 5. It follows the same reference and temperament as the meter, so you can play into it until the beats stop.</p>
+      <p>With headphones the drone never reaches the microphone. On the speaker, Beatwheel removes its own drone from what it hears, and near unison the readout switches to the beats per second you can hear.</p>
+    </div>
+  </section>
+
+  <section class="wrap drift">
+    <h2>See how far a held note drifts</h2>
+    <p class="muted">Record a held note for up to an hour, ten readings a second. Name the session, then export it as CSV or share it with the section.</p>
+    <div class="drift-grid">
+      <dl class="stats" aria-label="Brass sectional session, trumpet in B flat, 5 minutes">
+        <div><dt>Start, cents</dt><dd class="num">+1.7</dd></div>
+        <div><dt>End, cents</dt><dd class="num">-10.6</dd></div>
+        <div><dt>Cents a minute</dt><dd class="num accent">-2.10</dd></div>
+      </dl>
+      <img class="shot" src="shots/03-trumpet-drift-session.png" width="1080" height="1920" loading="lazy"
+           alt="Session detail for Brass sectional: a 5 minute chart of cents against minutes falling from +1.7 to -10.6, with start, end, range and cents a minute">
+      <div class="file">
+        <h3>Export CSV</h3>
+<pre>session,started_at,elapsed_s,written_note,sounding_note,target_hz,measured_hz,cents,reference_a_hz,temperament,profile,gap
+Brass sectional,2026-09-13T19:24:15.695+05:30,0.1,C5,Bb4,466.16,466.62,1.7,440.0,Equal,Trumpet in B flat,0
+Brass sectional,2026-09-13T19:24:15.695+05:30,180.0,C5,Bb4,466.16,464.93,-4.6,440.0,Equal,Trumpet in B flat,0
+Brass sectional,2026-09-13T19:24:15.695+05:30,353.6,C5,Bb4,466.16,463.30,-10.7,440.0,Equal,Trumpet in B flat,0</pre>
+        <p class="muted">One row per reading, with the written and sounding note, target and measured hertz, and cents.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap gallery">
+    <h2>Set up for the instrument in your hands</h2>
+    <div class="gal">
+      <figure>
+        <img class="shot" src="shots/04-a415-werckmeister-profile.png" width="1080" height="1920" loading="lazy"
+             alt="Edit profile screen for Baroque oboe with A4 at 415.0 Hz and Werckmeister III selected">
+        <figcaption>A from 415 to 466 in 0.1 Hz steps, and six temperaments on any tonic.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="shots/05-clarinet-written-sounding-dark.png" width="1080" height="1920" loading="lazy"
+             alt="Clarinet in B flat in dark mode, reading a written D4 at +1.2 cents with the sounding C4 beside it">
+        <figcaption>Transposing instruments show the written note large and the sounding note beside it.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="shots/06-stand-mode-harmonium-dark.png" width="1080" height="1920" loading="lazy"
+             alt="Stand mode in dark mode on the Harmonium profile: the strobe disc fills the width above a large C sharp 4 at -0.5 cents, 277.1 Hz">
+        <figcaption>Stand mode fills the screen and keeps it on through a rehearsal.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap details">
+    <div>
+      <h3>Temperaments</h3>
+      <p class="muted">Equal, just, Pythagorean, quarter-comma meantone, Werckmeister III and Kirnberger III, plus your own twelve cents offsets.</p>
+    </div>
+    <div>
+      <h3>Fifteen instrument profiles</h3>
+      <p class="muted">Chromatic, guitar, ukulele, violin, viola, cello, double bass, flute, oboe, clarinet, alto and tenor saxophone, trumpet, horn and harmonium. Copy any of them to make your own.</p>
+    </div>
+    <div>
+      <h3>Calm between notes</h3>
+      <p class="muted">A noise gate and a sensitivity setting with a live input meter, and a held-tone mode for oboe and harmonium that averages over a longer window.</p>
+    </div>
+    <div>
+      <h3>Your data stays on the device</h3>
+      <p class="muted">Profiles, temperaments and sessions go out as one backup file and come back in. No audio is ever saved. If you decline the microphone, the drone, profiles and sessions still work.</p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="price">USD 3.99<small>Paid once on Google Play. INR 149 in India.</small></div>
+      <div>
+        <p>One-time purchase. No ads, no subscription, no account. Works fully offline.</p>
+        <p>Beatwheel asks for the microphone and nothing else, and has no internet permission. It does not include a metronome, harmonic-by-harmonic strobes, or drum and tabla tuning.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Beatwheel by SocialSure Private Limited</span>
+    <a href="privacy-policy.html">Privacy policy</a>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var disc = document.getElementById("disc");
+    if (!disc || !("IntersectionObserver" in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { disc.classList.add("play"); io.disconnect(); }
+      });
+    }, { threshold: 0.4 });
+    io.observe(disc);
+  })();
+</script>
+</body>
+</html>
