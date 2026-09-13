@@ -78,8 +78,10 @@
   .drift { padding-block: 96px; border-top: 1px solid var(--rule); }
   .drift h2 { max-width: 20ch; }
   .drift > p { margin-top: 18px; }
-  .drift-grid { display: grid; grid-template-columns: 1fr minmax(0, 340px) 1.2fr; gap: 56px; align-items: center; margin-top: 56px; }
+  .drift-grid { display: grid; grid-template-columns: minmax(0, 340px) 1fr; gap: 56px 72px; align-items: center; margin-top: 56px; }
   .drift-grid > * { min-width: 0; }
+  .drift-grid .stats { grid-column: 2; grid-row: 1; }
+  .drift-grid .file { grid-column: 1 / -1; }
   .stats { margin: 0; display: grid; gap: 28px; }
   .stats dt { font-size: 0.95rem; color: var(--graphite); }
   .stats dd { margin: 0; font-family: var(--body); font-size: 2.4rem; line-height: 1.1; }
@@ -128,6 +130,7 @@
   }
   @media (max-width: 560px) {
     .drift-grid, .gal { grid-template-columns: minmax(0, 1fr); }
+    .drift-grid .stats { grid-column: auto; grid-row: auto; }
     .gal figure:nth-child(2) { margin-top: 0; }
     .gal figure, .drift-grid .shot { max-width: 340px; }
     .rules p { font-size: 1.35rem; }
