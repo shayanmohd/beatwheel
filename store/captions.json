@@ -1,0 +1,15 @@
+{
+  "background": ["#FB9136", "#EE6618"],
+  "text": "#18212A",
+  "frame": "#18212A",
+  "font": "fonts/barlow_semi_condensed_semibold.ttf",
+  "weight": 600,
+  "shots": [
+    { "src": "screenshots-raw/01-baroque-oboe-a415-disc-still.png", "out": "screenshots/01-baroque-oboe-a415-disc-still.png", "caption": "Still means in tune" },
+    { "src": "screenshots-raw/02-reed-drone-beats-per-second.png", "out": "screenshots/02-reed-drone-beats-per-second.png", "caption": "Tune while a drone plays" },
+    { "src": "screenshots-raw/03-trumpet-drift-session.png", "out": "screenshots/03-trumpet-drift-session.png", "caption": "Watch a held note drift" },
+    { "src": "screenshots-raw/04-a415-werckmeister-profile.png", "out": "screenshots/04-a415-werckmeister-profile.png", "caption": "A 415 to 466, six temperaments" },
+    { "src": "screenshots-raw/05-clarinet-written-sounding-dark.png", "out": "screenshots/05-clarinet-written-sounding-dark.png", "caption": "Written, sounding notes" },
+    { "src": "screenshots-raw/06-stand-mode-harmonium-dark.png", "out": "screenshots/06-stand-mode-harmonium-dark.png", "caption": "Readable from the stand" }
+  ]
+}

@@ -197,20 +197,20 @@
     <h2>See how far a held note drifts</h2>
     <p class="muted">Record a held note for up to an hour, ten readings a second. Name the session, then export it as CSV or share it with the section.</p>
     <div class="drift-grid">
-      <dl class="stats" aria-label="Brass sectional session, trumpet in B flat, 5 minutes">
+      <dl class="stats" aria-label="Tuesday brass session, trumpet in B flat, 42 minutes">
         <div><dt>Start, cents</dt><dd class="num">+1.7</dd></div>
-        <div><dt>End, cents</dt><dd class="num">-10.6</dd></div>
-        <div><dt>Cents a minute</dt><dd class="num accent">-2.10</dd></div>
+        <div><dt>End, cents</dt><dd class="num">-10.0</dd></div>
+        <div><dt>Cents a minute</dt><dd class="num accent">-0.29</dd></div>
       </dl>
       <img class="shot" src="shots/03-trumpet-drift-session.png" width="1080" height="1920" loading="lazy"
-           alt="Session detail for Brass sectional: a 5 minute chart of cents against minutes falling from +1.7 to -10.6, with start, end, range and cents a minute">
+           alt="Session detail for Tuesday brass: a 42 minute chart of cents against minutes sagging from +1.7 to -10.0 with a break near 21 minutes, with start, end, range and cents a minute">
       <div class="file">
         <h3>Export CSV</h3>
 <pre>session,started_at,elapsed_s,written_note,sounding_note,target_hz,measured_hz,cents,reference_a_hz,temperament,profile,gap
-Brass sectional,2026-09-13T19:24:15.695+05:30,0.1,C5,Bb4,466.16,466.62,1.7,440.0,Equal,Trumpet in B flat,0
-Brass sectional,2026-09-13T19:24:15.695+05:30,180.0,C5,Bb4,466.16,464.93,-4.6,440.0,Equal,Trumpet in B flat,0
-Brass sectional,2026-09-13T19:24:15.695+05:30,353.6,C5,Bb4,466.16,463.30,-10.7,440.0,Equal,Trumpet in B flat,0</pre>
-        <p class="muted">One row per reading, with the written and sounding note, target and measured hertz, and cents.</p>
+Tuesday brass,2026-09-08T18:02:00+05:30,0.0,C5,Bb4,466.16,466.66,1.8,440.0,Equal,Trumpet in B flat,0
+Tuesday brass,2026-09-08T18:02:00+05:30,1260.0,,,,,,440.0,Equal,Trumpet in B flat,1
+Tuesday brass,2026-09-08T18:02:00+05:30,2519.9,C5,Bb4,466.16,463.61,-9.5,440.0,Equal,Trumpet in B flat,0</pre>
+        <p class="muted">One row per reading, with the written and sounding note, target and measured hertz, and cents, plus a gap row wherever the app was in the background.</p>
       </div>
     </div>
   </section>
