@@ -8,8 +8,8 @@
     { "src": "screenshots-raw/01-baroque-oboe-a415-disc-still.png", "out": "screenshots/01-baroque-oboe-a415-disc-still.png", "caption": "Still means in tune" },
     { "src": "screenshots-raw/02-reed-drone-beats-per-second.png", "out": "screenshots/02-reed-drone-beats-per-second.png", "caption": "Tune while a drone plays" },
     { "src": "screenshots-raw/03-trumpet-drift-session.png", "out": "screenshots/03-trumpet-drift-session.png", "caption": "Watch a held note drift" },
-    { "src": "screenshots-raw/04-a415-werckmeister-profile.png", "out": "screenshots/04-a415-werckmeister-profile.png", "caption": "A 415 to 466, six temperaments" },
-    { "src": "screenshots-raw/05-clarinet-written-sounding-dark.png", "out": "screenshots/05-clarinet-written-sounding-dark.png", "caption": "Written, sounding notes" },
+    { "src": "screenshots-raw/04-a415-werckmeister-profile.png", "out": "screenshots/04-a415-werckmeister-profile.png", "caption": "Six temperaments, A\u00a0415\u00a0to\u00a0466" },
+    { "src": "screenshots-raw/05-clarinet-written-sounding-dark.png", "out": "screenshots/05-clarinet-written-sounding-dark.png", "caption": "Tune in your written key" },
     { "src": "screenshots-raw/06-stand-mode-harmonium-dark.png", "out": "screenshots/06-stand-mode-harmonium-dark.png", "caption": "Readable from the stand" }
   ]
 }
