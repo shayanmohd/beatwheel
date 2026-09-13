@@ -16,3 +16,8 @@ local.properties
 keystore.properties
 *.jks
 *.keystore
+
+# internal working files: research, release checklist and test captures stay off the public repo
+IDEA.json
+SHIP-READY.md
+store/smoke-*.png
